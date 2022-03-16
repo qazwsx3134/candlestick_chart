@@ -23,9 +23,10 @@ const Dashboard = () => {
             .then((res)=> res.json())
             .then((seriesData) => {
                 if (seriesData["Error Message"]) {
-                    console.log(seriesData)
                     setError('Please enter the correct symbol of stock')
-                } else {
+                } else if (seriesData["Note"]) {
+                    setError('Calling frequency is over the standard api, please wait few seconds')
+                }else {
                     setData(seriesData)
                     setError(null)
                 }
@@ -52,7 +53,7 @@ const Dashboard = () => {
             .finally(()=>{
                 setLoading(false)
             })
-    }, [])
+    }, []) // eslint-disable-line react-hooks/exhaustive-deps
     
     return (
         <div>
@@ -73,8 +74,8 @@ const Dashboard = () => {
                 </form>
             </div>
             <div className={styles.chartContainer}>
-                {error ? <h2 className={styles.error}> Please enter the correct symbol of stock</h2> : null }
-                <Chart data={data} loading={loading} />
+                {error ? <h2 className={styles.error}>{error}</h2> : null }
+                {data === null || loading ? <h2>loading</h2> : <Chart data={data} loading={loading} />}
             </div>
         </div>
     )

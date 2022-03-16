@@ -158,8 +158,6 @@ const Chart = ({ data = {}, loading}) => {
         })
     }, [memoizedValue])
 
-    if(data === null || loading) return <h2>loading</h2>
-
     return (
         <div>
             <ReactECharts
