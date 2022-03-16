@@ -1,0 +1,1 @@
+export const stockApi = (url='IBM') => fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${url}&apikey=${process.env.REACT_APP_API_KEY}`, {method: "GET"})
