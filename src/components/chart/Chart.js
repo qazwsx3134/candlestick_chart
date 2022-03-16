@@ -156,7 +156,7 @@ const Chart = ({ data = {}, loading}) => {
                 },
             ]
         })
-    }, [data])
+    }, [memoizedValue])
 
     if(data === null || loading) return <h2>loading</h2>
 
