@@ -26,38 +26,41 @@ const CandleStickChart = ({data}) => {
 
         //set up svg
         const svg = d3.select(svgRef.current)
-        .attr("width",width)
-        .attr("height",height)
+                    .attr("width",width)
+                    .attr("height",height)
 
         const svgContent = svg.select("#content")
-        .attr("width",width-margin.left*2)
-        .attr("height",height-margin.top*2)
+                            .attr("width",width-margin.left*2)
+                            .attr("height",height-margin.top*2)
 
         const volSvg = d3.select(volRef.current)
-        .attr("width",width)
-        .attr("height",volumeHeight)
+                        .attr("width",width)
+                        .attr("height",volumeHeight)
 
         const svgVolume = d3.select("#volume")
-        .attr("width",width-margin.left*2)
-        .attr("height",volumeHeight-margin.top)
+                            .attr("width",width-margin.left*2)
+                            .attr("height",volumeHeight-margin.top)
 
 
         const parseTime = d3.timeParse('%Y-%m-%d')
 
         //scale
 
-        const xScale = (data) => d3.scaleTime()
-        .domain([parseTime(data[0].date),parseTime(data[data.length-1].date)])
-        .range([margin.left, width-margin.right])
-        
+        const xScale = (data)=> d3.scaleTime()
+                                .domain([parseTime(data[0].date),parseTime(data[data.length-1].date)])
+                                .range([margin.left, width-margin.right])
+
+
         const yScale =(data)=> d3.scaleLinear()
-        .domain([d3.min(data, d=>d.low), d3.max(data, d=>d.high)])
-        .range([height-margin.bottom, margin.top])
+                                .domain([d3.min(data, d=>d.low), d3.max(data, d=>d.high)])
+                                .range([height-margin.bottom, margin.top])
+
 
         const vScale =(data)=> d3.scaleLinear()
-        .domain([d3.min(data, d=>parseInt(d.vol)), d3.max(data, d=>parseInt(d.vol))])
-        .range([volumeHeight-margin.bottom, margin.top])
+                                .domain([d3.min(data, d=>parseInt(d.vol)), d3.max(data, d=>parseInt(d.vol))])
+                                .range([volumeHeight-margin.bottom, margin.top])
 
+        //Draw for first time
         svgContent.call(drawCandleStick,data)
         svgVolume.call(drawVolume,data)
 
@@ -74,11 +77,12 @@ const CandleStickChart = ({data}) => {
                     let {k:mouseK,x:mouseX} = event.transform
 
                     let z = d3.scaleLinear()
-                    .domain([mouseX+mouseK,mouseX+ mouseK*width])
-                    .rangeRound([0, data.length-1])
+                            .domain([mouseX+mouseK,mouseX+ mouseK*width])
+                            .rangeRound([0, data.length-1])
 
                     let lp = z(margin.left), 
                         rp = z(width-margin.right)
+
                     let dataNew = data.slice(lp, rp)
 
                     svgContent.call(drawCandleStick, dataNew)
@@ -100,19 +104,19 @@ const CandleStickChart = ({data}) => {
         
             
             let xAxis = g => g.append('g')
-            .attr('transform', `translate(0, ${height-margin.bottom})`)
-            .attr('stroke','#5E4A3B')
-            .call( 
-                d3.axisBottom(x)
-                .tickValues(d3.timeMonday
-                    .range(parseTime(data[0].date), parseTime(data[data.length - 1].date)))
-                .tickFormat(d3.timeFormat("%m-%d"))
-            )
+                            .attr('transform', `translate(0, ${height-margin.bottom})`)
+                            .attr('stroke','#5E4A3B')
+                            .call( 
+                                d3.axisBottom(x)
+                                .tickValues(d3.timeMonday
+                                    .range(parseTime(data[0].date), parseTime(data[data.length - 1].date)))
+                                .tickFormat(d3.timeFormat("%m-%d"))
+                            )
         
             let yAxis = g => g.append('g')
-            .attr('transform', `translate(${margin.left}, 0)`)
-            .attr('stroke','#5E4A3B')
-            .call(d3.axisLeft(y))
+                            .attr('transform', `translate(${margin.left}, 0)`)
+                            .attr('stroke','#5E4A3B')
+                            .call(d3.axisLeft(y))
         
             g.append('g')
             .call(xAxis)
@@ -128,40 +132,44 @@ const CandleStickChart = ({data}) => {
             .attr('transform', data => `translate(${x(parseTime(data.date))}, 0)`)
             .attr("stroke", data => (data.open === data.close) ? "black" : (data.open > data.close) ? "green" : "red")
             .style('opacity',0.8)
+
             candles.append('line')
                 .attr('y1', d => y(d.high))
                 .attr('y2', d => y(d.low))
 
-        
-        
             candles.append('line')
                 .attr('y1', d => y(d.open))
                 .attr('y2', d => y(d.close))
                 .attr('stroke-width', candleWidth)
         }
+
+
         // draw the volume
         function drawVolume(g,data) {
+
             g.selectAll('g').remove()
 
             let x = xScale(data)
             let v = vScale(data)
+
             const sFormat = d3.format('~s')
+
             let [minVol, maxVol] = d3.extent(data.map(d=>parseInt(d.vol)))
+
             let xAxis = g => g.append('g')
-            .attr('transform', `translate(0, ${volumeHeight-margin.bottom*2})`)
-            .attr('stroke','#5E4A3B')
-            .call( 
-                d3.axisBottom(x)
-                .tickValues(d3.timeMonday
-                    .range(parseTime(data[0].date), parseTime(data[data.length - 1].date))
-                    )
-                .tickFormat(d3.timeFormat("%m-%d"))
-            )
+                            .attr('transform', `translate(0, ${volumeHeight-margin.bottom*2})`)
+                            .attr('stroke','#5E4A3B')
+                            .call( 
+                                d3.axisBottom(x)
+                                .tickValues(d3.timeMonday
+                                    .range(parseTime(data[0].date), parseTime(data[data.length - 1].date)))
+                                .tickFormat(d3.timeFormat("%m-%d"))
+                            )
 
             let vAxis = g => g.append('g')
-            .attr('transform', `translate(${margin.left}, ${-1*margin.bottom})`)
-            .attr('stroke','#5E4A3B')
-            .call(d3.axisLeft(v).tickFormat(sFormat))
+                            .attr('transform', `translate(${margin.left}, ${-1*margin.bottom})`)
+                            .attr('stroke','#5E4A3B')
+                            .call(d3.axisLeft(v).tickFormat(sFormat))
 
             g.append('g')
             .call(xAxis)
