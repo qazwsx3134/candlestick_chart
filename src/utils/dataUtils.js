@@ -23,3 +23,20 @@ export const mappingData = (api_data={}) => {
     let time = sorted_data.map(([time, ohlcv])=> time)
     return { ohlc, volumn, time, symbol }
 } 
+
+export const ohlcvData = (api_data={}) => { 
+    if (_.isEmpty(api_data)) return null 
+
+    return Object.entries(api_data["Time Series (Daily)"])
+    .sort(([aTime, aValue],[bTime, bValue]) => aTime.localeCompare(bTime))
+    .map(([time, ohlcv])=> {
+        return {
+            'open': ohlcv["1. open"],
+            'close': ohlcv["4. close"],
+            'low': ohlcv["3. low"],
+            'high': ohlcv["2. high"],
+            'vol': ohlcv["5. volume"],
+            'date': time
+        }
+    })
+}

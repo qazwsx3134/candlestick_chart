@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react'
 
-import Chart from 'components/chart/Chart'
+// import Chart from 'components/chart/Chart'
+import CandleStickChart from 'components/chart/CandleStickChart'
 import styles from './index.module.css'
 
 import { stockApi } from 'api/stockApi'
+
+import { ohlcvData } from 'utils/dataUtils'
 
 const Dashboard = () => {
     const [stockSymbol, setStockSymbol] = useState('MSFT')
@@ -27,7 +30,7 @@ const Dashboard = () => {
                 } else if (seriesData["Note"]) {
                     setError('Calling frequency is over the standard api, please wait few seconds')
                 }else {
-                    setData(seriesData)
+                    setData(ohlcvData(seriesData))
                     setError(null)
                 }
             })
@@ -39,13 +42,12 @@ const Dashboard = () => {
             })
     };
 
-
     useEffect(() => {
         // calling the default symbol of stock
         stockApi(stockSymbol)
             .then((res)=> res.json())
             .then((seriesData) => {
-                setData(seriesData)
+                setData(ohlcvData(seriesData))
             })
             .catch((err)=>{
                 setError(err)
@@ -75,7 +77,8 @@ const Dashboard = () => {
             </div>
             <div className={styles.chartContainer}>
                 {error ? <h2 className={styles.error}>{error}</h2> : null }
-                {data === null || loading ? <h2>loading</h2> : <Chart data={data} loading={loading} />}
+                {data === null || loading ? <h2>loading</h2> : <CandleStickChart data={data}/> }
+                
             </div>
         </div>
     )
