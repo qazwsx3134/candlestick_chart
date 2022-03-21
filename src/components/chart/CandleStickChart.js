@@ -19,10 +19,11 @@ const CandleStickChart = ({ data }) => {
 
   useEffect(() => {
     const { width, height } = wrapperRef.current.getBoundingClientRect()
+
     const candleWidth = 5
     const volumeHeight = 200
 
-    const extent = [[50, 50], [1102, 450]]
+    const extent = [[50, 30], [width - 2 * margin.left, height - 2 * margin.top]]
 
     //set up svg
     const svg = d3.select(svgRef.current)
@@ -74,7 +75,7 @@ const CandleStickChart = ({ data }) => {
           let { k: mouseK, x: mouseX } = event.transform
 
           let z = d3.scaleLinear()
-            .domain([mouseX + mouseK, mouseX + mouseK * width])
+            .domain([mouseX, mouseX + mouseK * width])
             .rangeRound([0, data.length - 1])
 
           let lp = z(margin.left),
@@ -82,8 +83,15 @@ const CandleStickChart = ({ data }) => {
 
           let dataNew = data.slice(lp, rp)
 
-          svgContent.call(drawCandleStick, dataNew)
-          svgVolume.call(drawVolume, dataNew)
+          // Prevent zooming when its not zoom
+          if (mouseK === 1 && mouseX === 0) {
+            svgContent.call(drawCandleStick, data)
+            svgVolume.call(drawVolume, data)
+          } else {
+            svgContent.call(drawCandleStick, dataNew)
+            svgVolume.call(drawVolume, dataNew)
+          }
+
         }))
     )
 
