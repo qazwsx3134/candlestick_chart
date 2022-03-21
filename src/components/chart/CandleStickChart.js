@@ -23,8 +23,6 @@ const CandleStickChart = ({ data }) => {
     const candleWidth = 5
     const volumeHeight = 200
 
-    const extent = [[50, 30], [width - 2 * margin.left, height - 2 * margin.top]]
-
     //set up svg
     const svg = d3.select(svgRef.current)
       .attr("width", width)
@@ -67,8 +65,8 @@ const CandleStickChart = ({ data }) => {
     svg.call(
       d3.zoom()
         .scaleExtent([1, 5])
-        .translateExtent(extent)
-        .extent(extent)
+        .translateExtent([[0, 0], [width, height]])
+        .extent([[0, 0], [width, height]])
         .on("zoom", _.debounce((event) => {
 
           // k zoom margin x = offset
@@ -78,19 +76,13 @@ const CandleStickChart = ({ data }) => {
             .domain([mouseX, mouseX + mouseK * width])
             .rangeRound([0, data.length - 1])
 
-          let lp = z(margin.left),
-            rp = z(width - margin.right)
+          let lp = z(0),
+            rp = z(width + margin.right * 2)
 
           let dataNew = data.slice(lp, rp)
 
-          // Prevent zooming when its not zoom
-          if (mouseK === 1 && mouseX === 0) {
-            svgContent.call(drawCandleStick, data)
-            svgVolume.call(drawVolume, data)
-          } else {
-            svgContent.call(drawCandleStick, dataNew)
-            svgVolume.call(drawVolume, dataNew)
-          }
+          svgContent.call(drawCandleStick, dataNew)
+          svgVolume.call(drawVolume, dataNew)
 
         }))
     )
